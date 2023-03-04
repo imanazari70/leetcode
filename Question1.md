@@ -1,3 +1,7 @@
+### Author's note
+
+I chose this question because it challenged the interviewee, based on purely JavaScript information and also the art of problem solving from https://bigfrontend.dev.
+
 ### Problem Description
 
 Currying is a useful technique used in JavaScript applications.
