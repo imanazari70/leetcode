@@ -1,3 +1,8 @@
+### Author's note
+
+I chose this question because it challenged the interviewee, based on purely JavaScript information and also the art of problem solving from https://bigfrontend.dev.
+
+
 ### Problem Description
 
 [Memoization](https://whatthefuck.is/memoization) is a common technique to boost performance. If you use React, you definitely have used `React.memo` before.
