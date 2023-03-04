@@ -1,56 +1,29 @@
-
 ### Problem Description
 
-Throttling is a common technique used in Web Application, in most cases using lodash solution would be a good choice.
+Currying is a useful technique used in JavaScript applications.
 
-could you implement your own version of basic `throttle()`?
+Please implement a curry() function, which accepts a function and return a curried one.
 
-In case you forgot, `throttle(func, delay)` will return a throttled function, which will invoke the func at a max frequency no matter how throttled one is called.
-
-Here is an example.
-
-Before throttling we have a series of calling like
-
-─A─B─C─ ─D─ ─ ─ ─ ─ ─ E─ ─F─G
-
-After throttling at wait time of 3 dashes
-
-─A─ ─ ─C─ ─ ─D ─ ─ ─ ─ E─ ─ ─G
-
-Be aware that
-
-- call A is triggered right way because not in waiting time
-- function call B is swallowed because B, C is in the cooling time from A, and C is latter.
-
-**notes**
-
-1. please follow above spec. the behavior is not exactly the same as `lodash.throttle()`
-
-2. because `window.setTimeout` and `window.clearTimeout` are not accurate in browser environment, they are replaced to other implementation when judging your code. They still have the same interface, and internally keep track of the timing for testing purpose.
-
-Something like below will be used to do the test.
+Here is an example
 
 ```js
-let currentTime = 0;
-
-const run = (input) => {
-  currentTime = 0;
-  const calls = [];
-
-  const func = (arg) => {
-    calls.push(`${arg}@${currentTime}`);
-  };
-
-  const throttled = throttle(func, 3);
-  input.forEach((call) => {
-    const [arg, time] = call.split('@');
-    setTimeout(() => throttled(arg), time);
-  });
-  return calls;
+const join = (a, b, c) => {
+  return `${a}_${b}_${c}`;
 };
 
-expect(run(['A@0', 'B@2', 'C@3'])).toEqual(['A@0', 'C@3']);
+const curriedJoin = curry(join);
+
+curriedJoin(1, 2, 3); // '1_2_3'
+
+curriedJoin(1)(2, 3); // '1_2_3'
+
+curriedJoin(1, 2)(3); // '1_2_3'
 ```
+
+more to read
+
+https://javascript.info/currying-partials
+https://lodash.com/docs/4.17.15#curry
 
 #
 
@@ -58,50 +31,27 @@ expect(run(['A@0', 'B@2', 'C@3'])).toEqual(['A@0', 'C@3']);
 
 ```js
 /**
- * @param {Function} func
- * @param {number} wait
+ * @param { Function } func
  */
-function throttle(func, wait) {
-  // Track if we are waiting. Initially, we are not.
-  let isWaiting = false;
-  // Track arguments of last call
-  let lastCallArgs = null;
-
-  return function throttled(...args) {
-    // If we are waiting,
-    if (isWaiting) {
-      // ...store arguments of last call
-      lastCallArgs = args;
-      return;
+function curry(func) {
+  // Return a wrapper function to make it curry-able.
+  return function curried(...args) {
+    // If passed arguments count is greater than or equal to original function 'func'
+    // parameters count, directly call 'func' with passed arguments.
+    if (args.length >= func.length) {
+      return func.apply(this, args);
+    } else {
+      // Otherwise return another wrapper function to gather new argument
+      // and pass it to `curried` function. This will continue until
+      // arguments count >= parameters count.
+      return function (...args2) {
+        return curried.apply(this, args.concat(args2));
+      };
     }
-
-    // If we are not waiting, execute 'func' with passed arguments
-    func.apply(this, args);
-    // Prevent future execution of 'func'
-    isWaiting = true;
-
-    // After wait time,
-    setTimeout(() => {
-      // ...allow execution of 'func'
-      isWaiting = false;
-
-      // If arguments of last call exists,
-      if (lastCallArgs) {
-        // ...execute function throttled and pass last call's arguments
-        // to it. Since now we are not waiting, 'func' will be executed
-        // and isWaiting will be reset to true.
-        throttled.apply(this, lastCallArgs);
-        // ...reset arguments of last call to null.
-        lastCallArgs = null;
-      }
-    }, wait);
-  });
+  };
 }
 ```
 
-#
+# Solution Link
 
-### Reference
-
-- [Simple throttle in js](https://stackoverflow.com/questions/27078285/simple-throttle-in-js#)
-- [Write a better throttle function with Underscore](https://gist.github.com/pinglu85/fbe672cb84faa987a1e97e20d844b108)
+https://leetcode.com/playground/kpgsxztQ
